@@ -152,20 +152,95 @@ export default function DashboardStats() {
     ]
   }
 
-  const chartOptions = {
+  // Options corrigées pour les graphiques
+  const pieOptions = {
     responsive: true,
     maintainAspectRatio: false,
     plugins: {
       legend: {
         position: 'bottom' as const,
         labels: {
-          font: { size: 12 }
+          font: {
+            size: 12
+          }
         }
       },
       tooltip: {
         backgroundColor: 'rgba(0,0,0,0.8)',
-        titleFont: { size: 14, weight: 'bold' },
-        bodyFont: { size: 13 }
+        titleFont: {
+          size: 14,
+          weight: 'bold' as const
+        },
+        bodyFont: {
+          size: 13
+        }
+      }
+    }
+  }
+
+  const lineOptions = {
+    responsive: true,
+    maintainAspectRatio: false,
+    plugins: {
+      legend: {
+        position: 'top' as const,
+        labels: {
+          font: {
+            size: 12
+          }
+        }
+      },
+      tooltip: {
+        backgroundColor: 'rgba(0,0,0,0.8)',
+        titleFont: {
+          size: 14,
+          weight: 'bold' as const
+        },
+        bodyFont: {
+          size: 13
+        }
+      }
+    },
+    scales: {
+      y: {
+        beginAtZero: true,
+        ticks: {
+          stepSize: 1
+        }
+      }
+    }
+  }
+
+  const barOptions = {
+    responsive: true,
+    maintainAspectRatio: false,
+    plugins: {
+      legend: {
+        position: 'top' as const,
+        labels: {
+          font: {
+            size: 12
+          }
+        }
+      },
+      tooltip: {
+        backgroundColor: 'rgba(0,0,0,0.8)',
+        titleFont: {
+          size: 14,
+          weight: 'bold' as const
+        },
+        bodyFont: {
+          size: 13
+        }
+      }
+    },
+    scales: {
+      y: {
+        beginAtZero: true,
+        ticks: {
+          stepSize: 1,
+          precision: 0
+        }
       }
     }
   }
@@ -235,7 +310,15 @@ export default function DashboardStats() {
             </div>
           </div>
           <div className="h-64">
-            <Line data={lineData} options={chartOptions} />
+            <Line 
+              data={{
+                ...lineData,
+                labels: timeRange === 'mois' 
+                  ? Object.keys(stats.evolutionMensuelle).slice(-6)
+                  : Object.keys(stats.evolutionMensuelle)
+              }}
+              options={lineOptions} 
+            />
           </div>
         </div>
 
@@ -244,7 +327,7 @@ export default function DashboardStats() {
           <h3 className="text-lg font-semibold mb-4">Répartition par branche</h3>
           <div className="h-64 flex items-center justify-center">
             {Object.keys(stats.repartitionBranche).length > 0 ? (
-              <Pie data={pieData} options={chartOptions} />
+              <Pie data={pieData} options={pieOptions} />
             ) : (
               <p className="text-gray-500">Aucune donnée disponible</p>
             )}
