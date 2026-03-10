@@ -1,0 +1,38 @@
+{
+  "name": "mega-datas",
+  "version": "0.1.0",
+  "private": true,
+    "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "next lint"
+  },
+  "dependencies": {
+    "@headlessui/react": "^2.2.9",
+    "@supabase/supabase-js": "^2.39.0",
+    "bcryptjs": "^2.4.3",
+    "chart.js": "^4.5.1",
+    "date-fns": "^3.0.0",
+    "framer-motion": "^12.35.2",
+    "jose": "^5.2.0",
+    "jspdf": "^4.2.0",
+    "jspdf-autotable": "^5.0.7",
+    "next": "14.x",
+    "react": "18.x",
+    "react-chartjs-2": "^5.3.1",
+    "react-dom": "18.x"
+  },
+  "devDependencies": {
+    "@types/bcryptjs": "^2.4.6",
+    "@types/node": "20.x",
+    "@types/react": "18.x",
+    "@types/react-dom": "18.x",
+    "autoprefixer": "^10.4.27",
+    "eslint": "^8.0.0",
+    "eslint-config-next": "14.x",
+    "postcss": "^8.5.8",
+    "tailwindcss": "^3.4.19",
+    "typescript": "5.x"
+  }
+}
