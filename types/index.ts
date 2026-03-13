@@ -3,6 +3,27 @@
 // Types d'utilisateurs
 export type UserRole = 'user' | 'admin'
 
+// Liste des services disponibles
+export const SERVICES = [
+  'La communication',
+  'Loisir',
+  'Art et Culture',
+  'Voir et entendre',
+  'Sport',
+  'Groupe de louange et d\'adoration',
+  'Books',
+  'Logistiques',
+  'Services d\'ordre',
+  'Protocole',
+  '28:19',
+  'Isaac',
+  'Intercessions',
+  'Gestion de culte',
+  'Aida'
+] as const
+
+export type Service = typeof SERVICES[number]
+
 // Interface pour un utilisateur (table utilisateurs)
 export interface User {
   id: string
@@ -34,6 +55,7 @@ export interface Member {
   commune: string
   ville: string
   telephone: string
+  service?: string  // Nouveau champ optionnel pour le service
   created_by: string  // ID de l'utilisateur qui a créé le membre
   created_at: string
 }
@@ -74,6 +96,9 @@ export interface MemberStats {
   byUser: {
     [userId: string]: number
   }
+  byService?: {
+    [service: string]: number  // Statistiques par service
+  }
   byDate?: {
     [date: string]: number
   }
@@ -85,6 +110,7 @@ export interface DashboardData {
   stats?: {
     total: number
     recentCount: number
+    byService?: Record<string, number>  // Ajout des stats par service
   }
 }
 
@@ -105,6 +131,7 @@ export interface AdminDashboardData {
     totalUsers: number
     totalAdmins: number
     recentMembers: number
+    byService?: Record<string, number>  // Statistiques par service
   }
 }
 
@@ -116,6 +143,7 @@ export interface MemberFormData {
   commune: string
   ville: string
   telephone: string
+  service?: string  // Nouveau champ optionnel
 }
 
 // Interface pour le formulaire d'inscription
@@ -174,6 +202,7 @@ export enum Branche {
 export interface FilterOptions {
   branche?: string
   ville?: string
+  service?: string  // Nouveau filtre par service
   dateDebut?: string
   dateFin?: string
   createdBy?: string

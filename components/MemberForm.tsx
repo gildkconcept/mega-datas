@@ -4,6 +4,7 @@ import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { useToast } from './Toast'
 import { motion, AnimatePresence } from 'framer-motion'
+import { SERVICES, Service } from '@/types'
 
 interface MemberFormProps {
   onMemberAdded?: () => void
@@ -19,7 +20,8 @@ export default function MemberForm({ onMemberAdded }: MemberFormProps) {
     quartier: '',
     commune: '',
     ville: '',
-    telephone: ''
+    telephone: '',
+    service: ''
   })
 
   const [errors, setErrors] = useState<Record<string, string>>({})
@@ -70,7 +72,8 @@ export default function MemberForm({ onMemberAdded }: MemberFormProps) {
         quartier: '',
         commune: '',
         ville: '',
-        telephone: ''
+        telephone: '',
+        service: ''
       })
       
       showToast('success', 'Membre enregistré avec succès !')
@@ -88,7 +91,7 @@ export default function MemberForm({ onMemberAdded }: MemberFormProps) {
     }
   }
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value } = e.target
     setFormData(prev => ({ ...prev, [name]: value }))
     // Effacer l'erreur du champ quand l'utilisateur commence à taper
@@ -116,44 +119,171 @@ export default function MemberForm({ onMemberAdded }: MemberFormProps) {
       </h2>
       
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        {[
-          { name: 'nom', label: 'Nom', type: 'text' },
-          { name: 'prenom', label: 'Prénom', type: 'text' },
-          { name: 'telephone', label: 'Téléphone', type: 'tel', placeholder: '0123456789' },
-          { name: 'ville', label: 'Ville', type: 'text' },
-          { name: 'commune', label: 'Commune', type: 'text' },
-          { name: 'quartier', label: 'Quartier', type: 'text' }
-        ].map((field) => (
-          <div key={field.name}>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-              {field.label}
-            </label>
-            <input
-              type={field.type}
-              name={field.name}
-              value={formData[field.name as keyof typeof formData]}
-              onChange={handleChange}
-              placeholder={field.placeholder || ''}
-              className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white transition-colors ${
-                errors[field.name]
-                  ? 'border-red-500 focus:ring-red-500'
-                  : 'border-gray-300 dark:border-gray-600'
-              }`}
-            />
-            <AnimatePresence>
-              {errors[field.name] && (
-                <motion.p
-                  initial={{ opacity: 0, y: -10 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0 }}
-                  className="mt-1 text-sm text-red-600 dark:text-red-400"
-                >
-                  {errors[field.name]}
-                </motion.p>
-              )}
-            </AnimatePresence>
-          </div>
-        ))}
+        <div>
+          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+            Nom
+          </label>
+          <input
+            type="text"
+            name="nom"
+            value={formData.nom}
+            onChange={handleChange}
+            className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white transition-colors ${
+              errors.nom
+                ? 'border-red-500 focus:ring-red-500'
+                : 'border-gray-300 dark:border-gray-600'
+            }`}
+          />
+          <AnimatePresence>
+            {errors.nom && (
+              <motion.p
+                initial={{ opacity: 0, y: -10 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0 }}
+                className="mt-1 text-sm text-red-600 dark:text-red-400"
+              >
+                {errors.nom}
+              </motion.p>
+            )}
+          </AnimatePresence>
+        </div>
+
+        <div>
+          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+            Prénom
+          </label>
+          <input
+            type="text"
+            name="prenom"
+            value={formData.prenom}
+            onChange={handleChange}
+            className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white transition-colors ${
+              errors.prenom
+                ? 'border-red-500 focus:ring-red-500'
+                : 'border-gray-300 dark:border-gray-600'
+            }`}
+          />
+          <AnimatePresence>
+            {errors.prenom && (
+              <motion.p
+                initial={{ opacity: 0, y: -10 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0 }}
+                className="mt-1 text-sm text-red-600 dark:text-red-400"
+              >
+                {errors.prenom}
+              </motion.p>
+            )}
+          </AnimatePresence>
+        </div>
+
+        <div>
+          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+            Téléphone
+          </label>
+          <input
+            type="tel"
+            name="telephone"
+            value={formData.telephone}
+            onChange={handleChange}
+            placeholder="0123456789"
+            className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white transition-colors ${
+              errors.telephone
+                ? 'border-red-500 focus:ring-red-500'
+                : 'border-gray-300 dark:border-gray-600'
+            }`}
+          />
+          <AnimatePresence>
+            {errors.telephone && (
+              <motion.p
+                initial={{ opacity: 0, y: -10 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0 }}
+                className="mt-1 text-sm text-red-600 dark:text-red-400"
+              >
+                {errors.telephone}
+              </motion.p>
+            )}
+          </AnimatePresence>
+        </div>
+
+        <div>
+          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+            Ville
+          </label>
+          <input
+            type="text"
+            name="ville"
+            value={formData.ville}
+            onChange={handleChange}
+            className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white transition-colors ${
+              errors.ville
+                ? 'border-red-500 focus:ring-red-500'
+                : 'border-gray-300 dark:border-gray-600'
+            }`}
+          />
+          <AnimatePresence>
+            {errors.ville && (
+              <motion.p
+                initial={{ opacity: 0, y: -10 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0 }}
+                className="mt-1 text-sm text-red-600 dark:text-red-400"
+              >
+                {errors.ville}
+              </motion.p>
+            )}
+          </AnimatePresence>
+        </div>
+
+        <div>
+          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+            Commune
+          </label>
+          <input
+            type="text"
+            name="commune"
+            value={formData.commune}
+            onChange={handleChange}
+            className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-white"
+          />
+        </div>
+
+        <div>
+          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+            Quartier
+          </label>
+          <input
+            type="text"
+            name="quartier"
+            value={formData.quartier}
+            onChange={handleChange}
+            className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-white"
+          />
+        </div>
+
+        {/* Nouveau champ Service avec liste déroulante */}
+        <div className="md:col-span-2">
+          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+            Service
+          </label>
+          <select
+            name="service"
+            value={formData.service}
+            onChange={handleChange}
+            className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-white"
+          >
+            <option value="">Sélectionner un service</option>
+            {SERVICES.map((service) => (
+              <option key={service} value={service}>
+                {service}
+              </option>
+            ))}
+          </select>
+          <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">
+            Sélectionnez le service auquel le membre est affecté
+          </p>
+        </div>
       </div>
 
       <div className="mt-6">

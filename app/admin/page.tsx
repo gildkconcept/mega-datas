@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation'
 import MembersList from '@/components/MembersList'
 import ExportPDF from '@/components/ExportPDF'
 import DashboardStats from '@/components/DashboardStats'
-import { MemberWithCreator, User } from '@/types'
+import { MemberWithCreator, User, SERVICES } from '@/types'
 
 export default function AdminPage() {
   const router = useRouter()
@@ -20,6 +20,7 @@ export default function AdminPage() {
   const [filterVille, setFilterVille] = useState('')
   const [filterCommune, setFilterCommune] = useState('')
   const [filterBranche, setFilterBranche] = useState('')
+  const [filterService, setFilterService] = useState('') // Nouveau filtre par service
   const [filterDateDebut, setFilterDateDebut] = useState('')
   const [filterDateFin, setFilterDateFin] = useState('')
   const [filterCreateur, setFilterCreateur] = useState('')
@@ -60,7 +61,7 @@ export default function AdminPage() {
 
     let filtered = [...members]
 
-    // Filtre texte (recherche dans nom, prénom, téléphone)
+    // Filtre texte (recherche dans nom, prénom, téléphone, service)
     if (searchTerm) {
       const term = searchTerm.toLowerCase()
       filtered = filtered.filter(m => 
@@ -68,7 +69,8 @@ export default function AdminPage() {
         m.prenom.toLowerCase().includes(term) ||
         m.telephone.includes(term) ||
         m.ville.toLowerCase().includes(term) ||
-        m.commune.toLowerCase().includes(term)
+        m.commune.toLowerCase().includes(term) ||
+        (m.service && m.service.toLowerCase().includes(term))
       )
     }
 
@@ -85,6 +87,11 @@ export default function AdminPage() {
     // Filtre par branche
     if (filterBranche) {
       filtered = filtered.filter(m => m.creator?.branche === filterBranche)
+    }
+
+    // NOUVEAU: Filtre par service
+    if (filterService) {
+      filtered = filtered.filter(m => m.service === filterService)
     }
 
     // Filtre par créateur
@@ -120,7 +127,7 @@ export default function AdminPage() {
     })
 
     setFilteredMembers(filtered)
-  }, [members, searchTerm, filterVille, filterCommune, filterBranche, filterCreateur, filterDateDebut, filterDateFin, sortBy])
+  }, [members, searchTerm, filterVille, filterCommune, filterBranche, filterService, filterCreateur, filterDateDebut, filterDateFin, sortBy])
 
   const fetchData = async () => {
     try {
@@ -153,17 +160,27 @@ export default function AdminPage() {
   const villes = [...new Set(members.map(m => m.ville).filter(Boolean))]
   const communes = [...new Set(members.map(m => m.commune).filter(Boolean))]
   const branches = [...new Set(users.map(u => u.branche).filter(Boolean))]
+  const services = SERVICES // Tous les services disponibles
 
   const resetFilters = () => {
     setSearchTerm('')
     setFilterVille('')
     setFilterCommune('')
     setFilterBranche('')
+    setFilterService('')
     setFilterCreateur('')
     setFilterDateDebut('')
     setFilterDateFin('')
     setSortBy('date_desc')
   }
+
+  // Statistiques par service
+  const statsParService = members.reduce((acc, member) => {
+    if (member.service) {
+      acc[member.service] = (acc[member.service] || 0) + 1
+    }
+    return acc
+  }, {} as Record<string, number>)
 
   if (loading) {
     return (
@@ -245,12 +262,41 @@ export default function AdminPage() {
 
         {activeTab === 'members' && (
           <div>
+            {/* Mini statistiques par service */}
+            <div className="mb-6 bg-white rounded-lg shadow p-4">
+              <h3 className="text-sm font-semibold text-gray-700 mb-3">Aperçu par service</h3>
+              <div className="flex flex-wrap gap-2">
+                {Object.entries(statsParService).map(([service, count]) => (
+                  <button
+                    key={service}
+                    onClick={() => {
+                      setFilterService(service)
+                      setShowFilters(true)
+                    }}
+                    className={`px-3 py-1 rounded-full text-xs font-medium transition-colors ${
+                      filterService === service
+                        ? 'bg-blue-500 text-white'
+                        : 'bg-blue-100 text-blue-800 hover:bg-blue-200'
+                    }`}
+                  >
+                    {service}: {count}
+                  </button>
+                ))}
+                <button
+                  onClick={() => setFilterService('')}
+                  className="px-3 py-1 rounded-full text-xs font-medium bg-gray-100 text-gray-600 hover:bg-gray-200"
+                >
+                  Réinitialiser
+                </button>
+              </div>
+            </div>
+
             {/* Barre de recherche et bouton filtres */}
             <div className="mb-4 flex flex-col md:flex-row gap-4">
               <div className="flex-1 relative">
                 <input
                   type="text"
-                  placeholder="🔍 Rechercher par nom, prénom, téléphone, ville..."
+                  placeholder="🔍 Rechercher par nom, prénom, téléphone, ville, service..."
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
                   className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
@@ -282,9 +328,9 @@ export default function AdminPage() {
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4" />
                   </svg>
                   Filtres
-                  {filterVille || filterCommune || filterBranche || filterCreateur || filterDateDebut || filterDateFin ? (
+                  {filterVille || filterCommune || filterBranche || filterService || filterCreateur || filterDateDebut || filterDateFin ? (
                     <span className="ml-2 bg-blue-200 text-blue-800 rounded-full w-5 h-5 flex items-center justify-center text-xs">
-                      {Object.values({ filterVille, filterCommune, filterBranche, filterCreateur, filterDateDebut, filterDateFin }).filter(Boolean).length}
+                      {Object.values({ filterVille, filterCommune, filterBranche, filterService, filterCreateur, filterDateDebut, filterDateFin }).filter(Boolean).length}
                     </span>
                   ) : null}
                 </button>
@@ -343,7 +389,7 @@ export default function AdminPage() {
                   {/* Filtre branche */}
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">
-                      Branche
+                      Branche du créateur
                     </label>
                     <select
                       value={filterBranche}
@@ -353,6 +399,23 @@ export default function AdminPage() {
                       <option value="">Toutes les branches</option>
                       {branches.map(branche => (
                         <option key={branche} value={branche}>{branche}</option>
+                      ))}
+                    </select>
+                  </div>
+
+                  {/* NOUVEAU: Filtre service */}
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      Service
+                    </label>
+                    <select
+                      value={filterService}
+                      onChange={(e) => setFilterService(e.target.value)}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                    >
+                      <option value="">Tous les services</option>
+                      {services.map(service => (
+                        <option key={service} value={service}>{service}</option>
                       ))}
                     </select>
                   </div>
